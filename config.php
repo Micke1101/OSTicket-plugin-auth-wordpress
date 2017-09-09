@@ -53,6 +53,7 @@ class WordpressConfig extends PluginConfig {
 		'wordpress-path' => new TextboxField(array(
                 'label' => $__('Wordpress path'),
                 'hint' => $__('Path to wordpress installation'),
+		'default' => 'wordpress',
                 'configuration' => array('size'=>70, 'length'=>120),
             ))
         );
