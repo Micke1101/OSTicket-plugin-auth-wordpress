@@ -41,14 +41,16 @@ class WordpressConfig extends PluginConfig {
             'database-name' => new TextboxField(array(
                 'label' => $__('Database name'),
                 'hint' => $__('What database on the server to look in'),
+		'default' => 'wordpress',
                 'configuration' => array('size'=>70, 'length'=>120),
             )),
 			'table-prefix' => new TextboxField(array(
                 'label' => $__('Table prefix'),
                 'hint' => $__('What is the prefix of the tables'),
+		'default' => 'wp_',
                 'configuration' => array('size'=>70, 'length'=>120),
             )),
-			'wordpress-path' => new TextboxField(array(
+		'wordpress-path' => new TextboxField(array(
                 'label' => $__('Wordpress path'),
                 'hint' => $__('Path to wordpress installation'),
                 'configuration' => array('size'=>70, 'length'=>120),
