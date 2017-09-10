@@ -41,19 +41,13 @@ class WordpressConfig extends PluginConfig {
             'database-name' => new TextboxField(array(
                 'label' => $__('Database name'),
                 'hint' => $__('What database on the server to look in'),
-        'default' => 'wordpress',
+                'default' => 'wordpress',
                 'configuration' => array('size'=>70, 'length'=>120),
             )),
             'table-prefix' => new TextboxField(array(
                 'label' => $__('Table prefix'),
                 'hint' => $__('What is the prefix of the tables'),
-        'default' => 'wp_',
-                'configuration' => array('size'=>70, 'length'=>120),
-            )),
-        'wordpress-path' => new TextboxField(array(
-                'label' => $__('Wordpress path'),
-                'hint' => $__('Path to wordpress installation'),
-        'default' => 'wordpress',
+                'default' => 'wp_',
                 'configuration' => array('size'=>70, 'length'=>120),
             ))
         );
@@ -62,11 +56,6 @@ class WordpressConfig extends PluginConfig {
     function pre_save(&$config, &$errors) {
         list($__, $_N) = self::translate();
         global $ost;
-        if (!file_exists($_SERVER['DOCUMENT_ROOT'] . "/" . $config['wordpress-path'] . '/wp-includes/class-phpass.php')) {
-            $errors['err'] = $__('Password class does not exist: ' 
-                        . $_SERVER['DOCUMENT_ROOT'] . "/" . $config['wordpress-path'] . '/wp-includes/class-phpass.php');
-            return;
-        }
         $c = new mysqli($config['server']
             ,$config['username']
             ,$config['password']

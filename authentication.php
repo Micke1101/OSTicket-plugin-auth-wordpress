@@ -1,6 +1,7 @@
 <?php
 require_once(INCLUDE_DIR.'class.plugin.php');
 require_once('config.php');
+require_once('PasswordHash.php');
 
 function flatten($array) {
     $a = array();
@@ -47,8 +48,6 @@ class WordpressAuthentication {
     }
     
     function checkPassword($password, $hash){
-        if(!class_exists("PasswordHash"))
-            require_once($_SERVER['DOCUMENT_ROOT'] . "/" . $this->getConfig()->get('wordpress-path') . '/wp-includes/class-phpass.php');
         $wp_hasher = new PasswordHash(8, TRUE);
         return $wp_hasher->CheckPassword($password, $hash);
     }
@@ -58,7 +57,7 @@ class WordpressAuthentication {
             return null;
 
         if(($c = $this->getConnection())){
-            $username = mysqli_real_escape_string($c, $username);
+			$username = mysqli_real_escape_string($c, $username);
             $result = $c->query("SELECT `user_login`, `user_pass`, `user_email`, `display_name` "
                 . "FROM `" . $this->getConfig()->get('table-prefix') . "users` "
                 . "WHERE `user_login` = '" . $username . "' OR `user_email` = '" . $username . "'");
