@@ -71,7 +71,7 @@ class WordpressConfig extends PluginConfig {
                         . "LIMIT 1");
 
         if ($result->num_rows == 0) {
-            $errors['err'] = $__('Unable to find wordpress user table, please check table prefix' . $result->num_rows);
+            $errors['err'] = $__('Unable to find wordpress user table, please check table prefix');
             return;
         }
         $c->close();
