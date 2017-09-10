@@ -58,6 +58,7 @@ class WordpressAuthentication {
             return null;
 
         if(($c = $this->getConnection())){
+            $username = mysqli_real_escape_string($c, $username);
             $result = $c->query("SELECT `user_login`, `user_pass`, `user_email`, `display_name` "
                 . "FROM `" . $this->getConfig()->get('table-prefix') . "users` "
                 . "WHERE `user_login` = '" . $username . "' OR `user_email` = '" . $username . "'");
