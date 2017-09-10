@@ -24,7 +24,7 @@ class WordpressConfig extends PluginConfig {
             'server' => new TextboxField(array(
                 'label' => $__('Database server'),
                 'hint' => $__('Default domain used in authentication and searches'),
-				'default' => 'localhost',
+                'default' => 'localhost',
                 'configuration' => array('size'=>40, 'length'=>60),
             )),
             'username' => new TextboxField(array(
@@ -41,22 +41,55 @@ class WordpressConfig extends PluginConfig {
             'database-name' => new TextboxField(array(
                 'label' => $__('Database name'),
                 'hint' => $__('What database on the server to look in'),
-		'default' => 'wordpress',
+        'default' => 'wordpress',
                 'configuration' => array('size'=>70, 'length'=>120),
             )),
-			'table-prefix' => new TextboxField(array(
+            'table-prefix' => new TextboxField(array(
                 'label' => $__('Table prefix'),
                 'hint' => $__('What is the prefix of the tables'),
-		'default' => 'wp_',
+        'default' => 'wp_',
                 'configuration' => array('size'=>70, 'length'=>120),
             )),
-		'wordpress-path' => new TextboxField(array(
+        'wordpress-path' => new TextboxField(array(
                 'label' => $__('Wordpress path'),
                 'hint' => $__('Path to wordpress installation'),
-		'default' => 'wordpress',
+        'default' => 'wordpress',
                 'configuration' => array('size'=>70, 'length'=>120),
             ))
         );
+    }
+    
+    function pre_save(&$config, &$errors) {
+        list($__, $_N) = self::translate();
+        global $ost;
+        if (!file_exists($_SERVER['DOCUMENT_ROOT'] . "/" . $config['wordpress-path'] . '/wp-includes/class-phpass.php')) {
+            $errors['err'] = $__('Password class does not exist: ' 
+                        . $_SERVER['DOCUMENT_ROOT'] . "/" . $config['wordpress-path'] . '/wp-includes/class-phpass.php');
+            return;
+        }
+        $c = new mysqli($config['server']
+            ,$config['username']
+            ,$config['password']
+            ,$config['database-name']);
+        if($c->connect_error){
+            $errors['err'] = $__('Unable to connect to wordpress database, error: ' . $c->connect_error);
+            return;
+        }
+        $result = $c->query("SELECT * "
+                        . "FROM information_schema.tables "
+                        . "WHERE table_schema = '" . $config['database-name'] . "' "
+                        . "AND table_name = '" . $config['table-prefix'] . "users' "
+                        . "LIMIT 1");
+
+        if ($result->num_rows == 0) {
+            $errors['err'] = $__('Unable to find wordpress user table, please check table prefix' . $result->num_rows);
+            return;
+        }
+        $c->close();
+        global $msg;
+        if (!$errors)
+            $msg = $__('Wordpress configuration updated successfully');
+        return !$errors;
     }
 }
 

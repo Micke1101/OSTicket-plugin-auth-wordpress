@@ -37,45 +37,46 @@ class WordpressAuthentication {
         if ($connection && !$force_reconnect)
             return $connection;
 
-		$c = new mysqli($this->getConfig()->get('server')
-			,$this->getConfig()->get('username')
-			,$this->getConfig()->get('password')
-			,$this->getConfig()->get('database-name'));
-		if(!$c->connect_error){
-			return $c;
-		}
+        $c = new mysqli($this->getConfig()->get('server')
+            ,$this->getConfig()->get('username')
+            ,$this->getConfig()->get('password')
+            ,$this->getConfig()->get('database-name'));
+        if(!$c->connect_error){
+            return $c;
+        }
     }
-	
-	function checkPassword($password, $hash){
-		include_once(__DIR__ . "/" . $this->getConfig()->get('wordpress-path') . '/wp-includes/class-phpass.php');
-		$wp_hasher = new PasswordHash(8, TRUE);
-		return $wp_hasher->CheckPassword($password, $hash);
-	}
+    
+    function checkPassword($password, $hash){
+        if(!class_exists("PasswordHash"))
+            require_once($_SERVER['DOCUMENT_ROOT'] . "/" . $this->getConfig()->get('wordpress-path') . '/wp-includes/class-phpass.php');
+        $wp_hasher = new PasswordHash(8, TRUE);
+        return $wp_hasher->CheckPassword($password, $hash);
+    }
 
     function authenticate($username, $password=null) {
         if (!$password)
             return null;
 
         if(($c = $this->getConnection())){
-			$result = $c->query("SELECT `user_login`, `user_pass`, `user_email`, `display_name` "
-				. "FROM `" . $this->getConfig()->get('table-prefix') . "users` "
-				. "WHERE `user_login` = '" . $username . "' OR `user_email` = '" . $username . "'");
-			$config = $this->getConfig();
-			
-			if ($result->num_rows > 0) {
-				while($row = $result->fetch_assoc()) {
-					if($this->checkPassword($password, $row["user_pass"])){
-						$info = array(
-							'email' => $row["user_email"],
-							'name' => $row["display_name"]
-						);
-						return $this->lookupAndSync($username, $info);
-					}
-				}
-			}
-			$c->close();
-		}
-		return null;
+            $result = $c->query("SELECT `user_login`, `user_pass`, `user_email`, `display_name` "
+                . "FROM `" . $this->getConfig()->get('table-prefix') . "users` "
+                . "WHERE `user_login` = '" . $username . "' OR `user_email` = '" . $username . "'");
+            $config = $this->getConfig();
+            
+            if ($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    if($this->checkPassword($password, $row["user_pass"])){
+                        $info = array(
+                            'email' => $row["user_email"],
+                            'name' => $row["display_name"]
+                        );
+                        return $this->lookupAndSync($username, $info);
+                    }
+                }
+            }
+            $c->close();
+        }
+        return null;
     }
 
     function lookupAndSync($username, $info) {
@@ -135,7 +136,7 @@ class WordpressAuthPlugin extends Plugin {
     var $config_class = 'WordpressConfig';
 
     function bootstrap() {
-		$config = $this->getConfig();
+        $config = $this->getConfig();
         UserAuthenticationBackend::register(new ClientLDAPAuthentication($config));
     }
 }

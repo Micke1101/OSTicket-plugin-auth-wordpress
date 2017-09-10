@@ -1,7 +1,7 @@
 <?php
 return array(
     'id' =>             'auth:wordpress', # notrans
-    'version' =>        '0.1',
+    'version' =>        '0.2',
     'name' =>           /* trans */ 'Wordpress Authentication and Lookup',
     'author' =>         'Micke1101',
     'description' =>    /* trans */ 'Provides a configurable authentication backend
